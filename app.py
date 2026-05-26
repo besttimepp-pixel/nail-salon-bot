@@ -36,13 +36,21 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    print("MESSAGE:", event.message.text)
+    user_id = event.source.user_id
+    text = event.message.text.strip()
+
+    if text == "จองคิว":
+        reply = start_booking(user_id)
+    else:
+        booking_reply = handle_booking(user_id, text)
+        reply = booking_reply if booking_reply else "พิมพ์ว่า จองคิว เพื่อเริ่มจองคิวค่ะ 💅"
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="บอทตอบแล้วค่ะ 💅")
+        TextSendMessage(text=reply)
     )
-
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+from services.booking import start_booking, handle_booking
