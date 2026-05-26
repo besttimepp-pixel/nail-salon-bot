@@ -7,14 +7,13 @@ from linebot.models import (
     TextSendMessage,
     ImageSendMessage
 )
+from dotenv import load_dotenv
+load_dotenv()
 
 import os
-
 app = Flask(__name__)
-
-# LINE TOKEN
-line_bot_api = LineBotApi(os.getenv("CHANNEL_ACCESS_TOKEN"))
-handler = WebhookHandler(os.getenv("CHANNEL_SECRET"))
+line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
+handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 
 @app.route("/")
@@ -95,30 +94,36 @@ def handle_message(event):
 
             messages = [
 
-                TextSendMessage(
-                    text="กรุณาโอนมัดจำเพื่อยืนยันคิว 💅\nยอดมัดจำ 100 บาท\nกรุณาโอนภายใน 15 นาที"
-                ),
+    TextSendMessage(
+        text="""กรุณาโอนมัดจำเพื่อยืนยันคิว 💅
 
-                ImageSendMessage(
-                    original_content_url="https://i.postimg.cc/HnjBsF4d/att-K4gpzl-KICLx6Zhpwnwz9PAKn3n-KYw0ZXo2x-Vu-Ypho-Xs.jpg",
-                    preview_image_url="https://i.postimg.cc/HnjBsF4d/att-K4gpzl-KICLx6Zhpwnwz9PAKn3n-KYw0ZXo2x-Vu-Ypho-Xs.jpg"
-                ),
+ยอดมัดจำ 100 บาท
+กรุณาโอนภายใน 15 นาที
 
-                ImageSendMessage(
-                    original_content_url="https://i.postimg.cc/NF0P2KtN/line-oa-chat-260222-171329.jpg",
-                    preview_image_url="https://i.postimg.cc/NF0P2KtN/line-oa-chat-260222-171329.jpg"
-                ),
+ธนาคาร: ทหารไทยธนชาต
+เลขบัญชี: 7609901702
+ชื่อบัญชี: ธิดารัตน์ บุญจันทร์"""
+    ),
 
-                TextSendMessage(
-                    text="หลังโอนเสร็จ กรุณาส่งสลิปเพื่อยืนยันคิว 🙏"
-                )
-            ]
+    ImageSendMessage(
+        original_content_url="https://i.postimg.cc/hvZgXJJ3/att-Ep-Sv-Klk-Yj-kty5NR45By-GTs-LD-0I-Lo-FVm-Qx-RXR8s-XM.jpg",
+        preview_image_url="https://i.postimg.cc/hvZgXJJ3/att-Ep-Sv-Klk-Yj-kty5NR45By-GTs-LD-0I-Lo-FVm-Qx-RXR8s-XM.jpg"
+    ),
 
+    ImageSendMessage(
+        original_content_url="https://i.postimg.cc/dQjcpCDn/line-oa-chat-260222-171329.jpg",
+        preview_image_url="https://i.postimg.cc/dQjcpCDn/line-oa-chat-260222-171329.jpg"
+    ),
+
+    TextSendMessage(
+        text="หลังโอนเสร็จ กรุณาส่งสลิปเพื่อยืนยันคิว 🙏"
+    )
+
+]
             line_bot_api.reply_message(
                 event.reply_token,
                 messages
             )
-
         else:
 
             line_bot_api.reply_message(
