@@ -15,11 +15,6 @@ LINE_CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET")
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
-
-@app.route("/")
-def home():
-    return "Nail Salon Bot Running!"
-
 @app.route("/callback", methods=["POST"])
 def callback():
     signature = request.headers.get("X-Line-Signature")
@@ -27,39 +22,10 @@ def callback():
 
     try:
         handler.handle(body, signature)
-    except InvalidSignatureError:
-        return "Invalid signature", 400
-
-    return "OK"
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    text = event.message.text
-
-    if text == "จองคิว":
-        reply = "สวัสดีค่ะ 💅 กรุณาเลือกบริการ: ต่อเล็บ / ทำสีเจล / เพ้นท์ลาย"
-    else:
-        reply = "พิมพ์ว่า จองคิว เพื่อเริ่มจองคิวค่ะ"
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply)
-    )
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-@app.route("/callback", methods=["POST"])
-def callback():
-    signature = request.headers.get("X-Line-Signature")
-    body = request.get_data(as_text=True)
-
-    if not signature:
-        return "OK", 200
-
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
+    except Exception:
         return "OK", 200
 
     return "OK", 200
+
+
+
