@@ -101,11 +101,11 @@ def handle_message(event):
     user_id = event.source.user_id
     text = event.message.text.strip()
     if text == "groupid":
-    line_bot_api.reply_message(
+        line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=event.source.group_id)
-    )
-    return
+        )
+        return
 
     if text == "จองคิว":
         reply = start_booking(user_id)
