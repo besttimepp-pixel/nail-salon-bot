@@ -49,3 +49,17 @@ def handle_message(event):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+@app.route("/callback", methods=["POST"])
+def callback():
+    signature = request.headers.get("X-Line-Signature")
+    body = request.get_data(as_text=True)
+
+    if not signature:
+        return "OK", 200
+
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        return "OK", 200
+
+    return "OK", 200
