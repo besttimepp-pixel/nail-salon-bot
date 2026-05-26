@@ -1,7 +1,7 @@
 from flask import Flask, request
 from dotenv import load_dotenv
 import os
-
+from services.booking import start_booking, handle_booking
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
@@ -53,4 +53,3 @@ def handle_message(event):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-from services.booking import start_booking, handle_booking
