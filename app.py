@@ -89,7 +89,7 @@ if len(lines) >= 3:
     elif lines[2] == "2":
         lines[2] = "คลองหก"
 
-text = "\n".join(lines)
+    text = "\n".join(lines)
     if text == "จองคิว":
 
         reply = start_booking(user_id)
