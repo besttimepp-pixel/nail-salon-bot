@@ -79,11 +79,17 @@ def handle_message(event):
     text = event.message.text.strip()
     
     # แปลงเลขสาขา
-    if "\n1\n" in f"\n{text}\n":
-        text = text.replace("\n1\n", "\nสาขาตลาดเชฟวันโก\n")
+    # แปลงเลขสาขา
+lines = text.split("\n")
 
-    elif "\n2\n" in f"\n{text}\n":
-        text = text.replace("\n2\n", "\nสาขาคลองหก\n")
+if len(lines) >= 3:
+    if lines[2] == "1":
+        lines[2] = "ตลาดเชฟวันโก"
+
+    elif lines[2] == "2":
+        lines[2] = "คลองหก"
+
+text = "\n".join(lines)
     if text == "จองคิว":
 
         reply = start_booking(user_id)
