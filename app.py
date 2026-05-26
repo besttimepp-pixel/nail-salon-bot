@@ -82,6 +82,15 @@ def handle_booking(user_id, text):
     lines = text.strip().split("\n")
 
     if len(lines) >= 6:
+        new_booking = parse_booking(text)
+
+        if is_technician_busy(new_booking):
+            return "technician_busy"
+
+        bookings = load_bookings()
+        bookings.append(new_booking)
+        save_bookings(bookings)
+
         return "booking_complete"
 
     return None
@@ -91,6 +100,12 @@ def handle_booking(user_id, text):
 def handle_message(event):
     user_id = event.source.user_id
     text = event.message.text.strip()
+    if text == "groupid":
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.source.group_id)
+    )
+    return
 
     if text == "จองคิว":
         reply = start_booking(user_id)
@@ -108,6 +123,7 @@ def handle_message(event):
         messages = [
             TextSendMessage(
                 text="""กรุณาโอนมัดจำเพื่อยืนยันคิว 💅
+
 
 ยอดมัดจำ 100 บาท
 กรุณาโอนภายใน 15 นาที
@@ -154,3 +170,49 @@ def handle_image(event):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+import json
+
+BOOKING_FILE = "data/bookings.json"
+
+
+def load_bookings():
+    if not os.path.exists(BOOKING_FILE):
+        return []
+
+    with open(BOOKING_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_bookings(bookings):
+    os.makedirs("data", exist_ok=True)
+
+    with open(BOOKING_FILE, "w", encoding="utf-8") as f:
+        json.dump(bookings, f, ensure_ascii=False, indent=2)
+
+
+def parse_booking(text):
+    lines = text.strip().split("\n")
+
+    return {
+        "name": lines[0],
+        "phone": lines[1],
+        "branch": lines[2],
+        "date": lines[3],
+        "time": lines[4],
+        "technician": lines[5],
+        "service": lines[6] if len(lines) > 6 else ""
+    }
+
+
+def is_technician_busy(new_booking):
+    bookings = load_bookings()
+
+    for booking in bookings:
+        if (
+            booking["date"] == new_booking["date"]
+            and booking["time"] == new_booking["time"]
+            and booking["technician"] == new_booking["technician"]
+        ):
+            return True
+
+    return False
