@@ -77,12 +77,13 @@ def handle_message(event):
 
     user_id = event.source.user_id
     text = event.message.text.strip()
-#แปลงเลขสาขา
-    if "สาขา: 1" in text:
-        text = text.replace("สาขา: 1", "สาขาตลาดเชฟวันโก")
-    elif "สาขา: 2" in text:
-        text = text.replace("สาขา: 2", "สาขาคลองหก")    
+    
+    # แปลงเลขสาขา
+    if "\n1\n" in f"\n{text}\n":
+        text = text.replace("\n1\n", "\nสาขาตลาดเชฟวันโก\n")
 
+    elif "\n2\n" in f"\n{text}\n":
+        text = text.replace("\n2\n", "\nสาขาคลองหก\n")
     if text == "จองคิว":
 
         reply = start_booking(user_id)
@@ -91,12 +92,11 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=reply)
         )
-
+    
     else:
-
         booking_reply = handle_booking(user_id, text)
 
-        if booking_reply:
+    if booking_reply:
 
             messages = [
 
@@ -133,11 +133,11 @@ def handle_image(event):
         TextSendMessage(
             text="""ชำระมัดจำเรียบร้อยแล้วค่ะ ✅
 
-ทางร้านยืนยันคิวให้เรียบร้อยแล้ว
-ขอบคุณที่ใช้บริการ 103STUDIO 💅"""
+    ทางร้านยืนยันคิวให้เรียบร้อยแล้ว
+    ขอบคุณที่ใช้บริการ 103STUDIO 💅"""
         )
     )
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    if __name__ == "__main__":
+        port = int(os.environ.get("PORT", 5000))
+        app.run(host="0.0.0.0", port=port)
