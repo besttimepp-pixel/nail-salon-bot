@@ -21,7 +21,7 @@ def callback():
     except Exception:
         return "OK", 200
     return "OK", 200
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent)
 def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
