@@ -5,7 +5,8 @@ from linebot.models import (
     MessageEvent,
     TextMessage,
     TextSendMessage,
-    ImageSendMessage
+    ImageSendMessage,
+    ImageMessage
 )
 from dotenv import load_dotenv
 load_dotenv()
@@ -125,25 +126,12 @@ def handle_image(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(
-            text="""ได้รับสลิปแล้วค่ะ ✅
+            text="""ชำระมัดจำเรียบร้อยแล้วค่ะ ✅
 
-ทางร้านจะตรวจสอบยอดโอน
-และยืนยันคิวให้ภายในไม่กี่นาทีค่ะ 🙏"""
+ทางร้านยืนยันคิวให้เรียบร้อยแล้ว
+ขอบคุณที่ใช้บริการ 103STUDIO 💅"""
         )
     )
-            line_bot_api.reply_message(
-                event.reply_token,
-                messages
-            )
-        else:
-
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(
-                    text="พิมพ์ว่า จองคิว เพื่อเริ่ม"
-                )
-            )
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
