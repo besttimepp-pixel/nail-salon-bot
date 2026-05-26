@@ -41,7 +41,9 @@ def start_booking(user_id):
 
 ชื่อเล่น:
 เบอร์โทร:
-สาขา:
+สาขา: พิมพ์หมายเลขเท่านั้น
+พิมพ์หมายเลข 1 = สาขาตลาดเชฟวันโก
+พิมพ์หมายเลข 2 = สาขาคลองหก
 วันที่:
 เวลา:
 จองช่างประจำหรือไม่:
@@ -60,7 +62,6 @@ def start_booking(user_id):
 บริการ: ทาสีเจลมือ, เพ้นท์ลาย
 """
 
-
 # ฟังก์ชันตรวจข้อมูล
 def handle_booking(user_id, text):
 
@@ -70,18 +71,17 @@ def handle_booking(user_id, text):
         return "booking_complete"
 
     return None
-if text == "1":
-    booking_data["branch"] = "ตลาดเชฟวันโก"
-elif text == "2":
-    booking_data["branch"] = "คลองหก"
-else:
-    booking_data["branch"] = text
-    
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
 
     user_id = event.source.user_id
     text = event.message.text.strip()
+#แปลงเลขสาขา
+    if "สาขา: 1" in text:
+        text = text.replace("สาขา: 1", "สาขาตลาดเชฟวันโก")
+    elif "สาขา: 2" in text:
+        text = text.replace("สาขา: 2", "สาขาคลองหก")    
 
     if text == "จองคิว":
 
