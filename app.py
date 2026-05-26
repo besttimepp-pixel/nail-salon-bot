@@ -24,7 +24,13 @@ def callback():
         handler.handle(body, signature)
     except Exception:
         return "OK", 200
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
 
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="สวัสดีครับ")
+    )
     return "OK", 200
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
