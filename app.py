@@ -4,15 +4,17 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import (
     MessageEvent,
     TextMessage,
+    ImageMessage,
     TextSendMessage,
-    ImageSendMessage,
-    ImageMessage
+    ImageSendMessage
 )
 from dotenv import load_dotenv
+import os
+
 load_dotenv()
 
-import os
 app = Flask(__name__)
+
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
@@ -22,9 +24,9 @@ def home():
     return "Bot is running"
 
 
-@app.route("/callback", methods=['POST'])
+@app.route("/callback", methods=["POST"])
 def callback():
-    signature = request.headers['X-Line-Signature']
+    signature = request.headers["X-Line-Signature"]
     body = request.get_data(as_text=True)
 
     try:
@@ -32,16 +34,15 @@ def callback():
     except InvalidSignatureError:
         abort(400)
 
-    return 'OK'
+    return "OK"
 
 
-# ฟังก์ชันเริ่มจอง
 def start_booking(user_id):
     return """กรุณาส่งข้อมูลตามนี้
 
 ชื่อเล่น:
 เบอร์โทร:
-สาขา: พิมพ์หมายเลขเท่านั้น
+สาขา:
 พิมพ์หมายเลข 1 = สาขาตลาดเชฟวันโก
 พิมพ์หมายเลข 2 = สาขาคลองหก
 วันที่:
@@ -54,7 +55,7 @@ def start_booking(user_id):
 
 ชื่อเล่น: แพรว
 เบอร์โทร: 0999999999
-สาขา: ตลาดเชฟวันโก
+สาขา: 1
 วันที่: 27/05/2026
 เวลา: 14:00
 จองช่างประจำหรือไม่: จอง
@@ -62,9 +63,22 @@ def start_booking(user_id):
 บริการ: ทาสีเจลมือ, เพ้นท์ลาย
 """
 
-# ฟังก์ชันตรวจข้อมูล
-def handle_booking(user_id, text):
 
+def convert_branch(text):
+    lines = text.strip().split("\n")
+
+    if len(lines) >= 3:
+        branch = lines[2].strip()
+
+        if branch == "1":
+            lines[2] = "สาขาตลาดเชฟวันโก"
+        elif branch == "2":
+            lines[2] = "สาขาคลองหก"
+
+    return "\n".join(lines)
+
+
+def handle_booking(user_id, text):
     lines = text.strip().split("\n")
 
     if len(lines) >= 6:
@@ -72,42 +86,28 @@ def handle_booking(user_id, text):
 
     return None
 
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-
     user_id = event.source.user_id
     text = event.message.text.strip()
-    
-    # แปลงเลขสาขา
-    # แปลงเลขสาขา
-lines = text.split("\n")
 
-if len(lines) >= 3:
-    if lines[2] == "1":
-        lines[2] = "ตลาดเชฟวันโก"
-
-    elif lines[2] == "2":
-        lines[2] = "คลองหก"
-
-    text = "\n".join(lines)
     if text == "จองคิว":
-
         reply = start_booking(user_id)
 
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=reply)
         )
-    
-    else:
-        booking_reply = handle_booking(user_id, text)
+        return
+
+    text = convert_branch(text)
+    booking_reply = handle_booking(user_id, text)
 
     if booking_reply:
-
-            messages = [
-
-    TextSendMessage(
-        text="""กรุณาโอนมัดจำเพื่อยืนยันคิว 💅
+        messages = [
+            TextSendMessage(
+                text="""กรุณาโอนมัดจำเพื่อยืนยันคิว 💅
 
 ยอดมัดจำ 100 บาท
 กรุณาโอนภายใน 15 นาที
@@ -115,23 +115,29 @@ if len(lines) >= 3:
 ธนาคาร: ทหารไทยธนชาต
 เลขบัญชี: 7609901702
 ชื่อบัญชี: ธิดารัตน์ บุญจันทร์"""
-    ),
+            ),
+            ImageSendMessage(
+                original_content_url="https://i.postimg.cc/hvZgXJJ3/att-Ep-Sv-Klk-Yj-kty5NR45By-GTs-LD-0I-Lo-FVm-Qx-RXR8s-XM.jpg",
+                preview_image_url="https://i.postimg.cc/hvZgXJJ3/att-Ep-Sv-Klk-Yj-kty5NR45By-GTs-LD-0I-Lo-FVm-Qx-RXR8s-XM.jpg"
+            ),
+            ImageSendMessage(
+                original_content_url="https://i.postimg.cc/dQjcpCDn/line-oa-chat-260222-171329.jpg",
+                preview_image_url="https://i.postimg.cc/dQjcpCDn/line-oa-chat-260222-171329.jpg"
+            ),
+            TextSendMessage(
+                text="หลังโอนเสร็จ กรุณาส่งสลิปเพื่อยืนยันคิว 🙏"
+            )
+        ]
 
-    ImageSendMessage(
-        original_content_url="https://i.postimg.cc/hvZgXJJ3/att-Ep-Sv-Klk-Yj-kty5NR45By-GTs-LD-0I-Lo-FVm-Qx-RXR8s-XM.jpg",
-        preview_image_url="https://i.postimg.cc/hvZgXJJ3/att-Ep-Sv-Klk-Yj-kty5NR45By-GTs-LD-0I-Lo-FVm-Qx-RXR8s-XM.jpg"
-    ),
+        line_bot_api.reply_message(event.reply_token, messages)
 
-    ImageSendMessage(
-        original_content_url="https://i.postimg.cc/dQjcpCDn/line-oa-chat-260222-171329.jpg",
-        preview_image_url="https://i.postimg.cc/dQjcpCDn/line-oa-chat-260222-171329.jpg"
-    ),
+    else:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="พิมพ์ว่า จองคิว เพื่อเริ่ม")
+        )
 
-    TextSendMessage(
-        text="หลังโอนเสร็จ กรุณาส่งสลิปเพื่อยืนยันคิว 🙏"
-    )
 
-]
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image(event):
     line_bot_api.reply_message(
@@ -139,10 +145,11 @@ def handle_image(event):
         TextSendMessage(
             text="""ชำระมัดจำเรียบร้อยแล้วค่ะ ✅
 
-    ทางร้านยืนยันคิวให้เรียบร้อยแล้ว
-    ขอบคุณที่ใช้บริการ 103STUDIO 💅"""
+ทางร้านยืนยันคิวให้เรียบร้อยแล้ว
+ขอบคุณที่ใช้บริการ 103STUDIO 💅"""
         )
     )
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
