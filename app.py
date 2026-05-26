@@ -39,12 +39,11 @@ def handle_message(event):
     user_id = event.source.user_id
     text = event.message.text.strip()
 
-    if text == "จองคิว":
-        reply = start_booking(user_id)
-    else:
-        booking_reply = handle_booking(user_id, text)
-        reply = booking_reply if booking_reply else "พิมพ์ว่า จองคิว เพื่อเริ่มจองคิวค่ะ 💅"
-
+   if text == "จองคิว":
+    reply = start_booking(user_id)
+else:
+    booking_reply = handle_booking(user_id, text)
+    reply = booking_reply if booking_reply else "พิมพ์ว่า จองคิว เพื่อเริ่มจองคิวค่ะ 💅"
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply)
