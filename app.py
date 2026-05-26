@@ -120,6 +120,17 @@ def handle_message(event):
     )
 
 ]
+            @handler.add(MessageEvent, message=ImageMessage)
+def handle_image(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(
+            text="""ได้รับสลิปแล้วค่ะ ✅
+
+ทางร้านจะตรวจสอบยอดโอน
+และยืนยันคิวให้ภายในไม่กี่นาทีค่ะ 🙏"""
+        )
+    )
             line_bot_api.reply_message(
                 event.reply_token,
                 messages
