@@ -70,8 +70,13 @@ def handle_booking(user_id, text):
         return "booking_complete"
 
     return None
-
-
+if text == "1":
+    booking_data["branch"] = "ตลาดเชฟวันโก"
+elif text == "2":
+    booking_data["branch"] = "คลองหก"
+else:
+    booking_data["branch"] = text
+    
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
 
